@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlgsplit,v 1.8 2004-03-28 16:56:45 psy Exp $
+# $Id: dlgsplit,v 1.9 2004-03-28 19:10:34 psy Exp $
 #
 # This script splits a text file containing n DLG messages into n files --
 # named xx1, xx2, etc. -- each containing one message.
@@ -32,6 +32,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
 DIGITS=6
 PREFIX="xx"
 NUM_FILES=0
+QUIETMODE=0
 
 # Usage instructions
 ME=`basename $0`
@@ -39,6 +40,7 @@ USAGE="Usage: $ME [options] message_file
 
 General options:
     -p PREFIX       use PREFIX instead of \`xx'
+    -q              quiet mode (do not output progress)
     -?, --help      output this message and exit
     -v, --version   output version information and exit
 "
@@ -61,6 +63,9 @@ do
 	       fi
 	       PREFIX="$1"
 	       ;;
+    -q)        shift
+	       QUIETMODE=1
+               ;;
     -\?)       echo "$USAGE"; exit 0    ;;
     --\?)      echo "$USAGE"; exit 0    ;;
     --help)    echo "$USAGE"; exit 0    ;;
@@ -93,12 +98,17 @@ mkdir /tmp/dlgsplit.$$
 cd /tmp/dlgsplit.$$
 
 # Split file
-csplit --digits=$DIGITS $CWD/$FILENAME '/^\[From    \]/' '{*}' 1>&2 >/dev/null
+csplit -z --digits=$DIGITS $CWD/$FILENAME '/^\[From    \]/' '{*}' \
+    1>&2 >/dev/null
 
 # Rename files according to their message numbers
 for F in *
 do
     G=`head -1 $F | sed -e 's/^.*MSG //;s/ OF.*//'`
+    if [ $QUIETMODE -ne 0 ]
+    then
+	echo "Found message $G..."
+    fi
     mv "$F" "$CWD/$PREFIX$G"
 done
 
