@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlg2html,v 1.5 2004-03-28 19:12:04 psy Exp $
+# $Id: dlg2html,v 1.6 2004-03-28 20:13:00 psy Exp $
 #
 # This script parses files containing DLG messages and produces XHTML pages.
 # Input consists of text files xx1, xx2, etc.; output consists
@@ -97,18 +97,18 @@ do
     esac
     shift
 done
-if [ `ls -1 $PREFIX* | wc -l` -eq 0 ]
+if [ `ls -1 $PREFIX*[^.html] | wc -l` -eq 0 ]
 then
     error "no message files matching prefix \`$PREFIX'"
     exit 1
 fi
 
 # Determine first and last message numbers
-FIRST_MSG=`ls -1 $PREFIX* \
+FIRST_MSG=`ls -1 $PREFIX*[^.html] \
     | sort -n -k 1.$((${#PREFIX}+1)) \
     | head -1 \
     | cut -c$((${#PREFIX}+1))-`
-LAST_MSG=`ls -1 $PREFIX* \
+LAST_MSG=`ls -1 $PREFIX*[^.html] \
     | sort -n -k 1.$((${#PREFIX}+1)) \
     | tail -1 \
     | cut -c$((${#PREFIX}+1))-`
@@ -184,7 +184,7 @@ do
     # Extract header data from next message
     if [ $MSG -lt $LAST_MSG ]
     then
-	NEXT=`ls -1 $PREFIX* \
+	NEXT=`ls -1 $PREFIX*[^.html] \
 	    | sort -n -k 1.$((${#PREFIX}+1)) \
 	    | grep "^$PREFIX$MSG\$" -A 1 \
 	    | tail -1 \
@@ -201,7 +201,7 @@ do
     # Extract header data from previous message
     if [ $MSG -gt $FIRST_MSG ]
     then
-	PREV=`ls -1 $PREFIX* \
+	PREV=`ls -1 $PREFIX*[^.html] \
 	    | sort -n -k 1.$((${#PREFIX}+1)) \
 	    | grep "^$PREFIX$MSG\$" -B 1 \
 	    | head -1 \
@@ -227,7 +227,7 @@ do
     <link rel="Up" href="$ROOT_URL" />
     <link rel="Contents" href="$ROOT_URL" />
     <link rel="First" href="$PREFIX$FIRST_MSG.html" />  
-    <link rel="Index" href="$PREFIX_date.html" />  
+    <link rel="Index" href="${PREFIX}_date.html" />  
     <link rel="Last" href="$PREFIX$LAST_MSG.html" />  
 EOF
     if [ $MSG -lt $LAST_MSG ]
@@ -284,9 +284,9 @@ EOF
     fi
     cat >>$F.html <<EOF
       <tr><th>Messages sorted by:</th><td>[&nbsp;<a
-	    href="$PREFIX_date.html">date</a>&nbsp;] [&nbsp;<a
-	    href="$PREFIX_subject.html">subject</a>&nbsp;] [&nbsp;<a
-	    href="$PREFIX_author.html">author</a>&nbsp;]</td></tr>
+	    href="${PREFIX}_date.html">date</a>&nbsp;] [&nbsp;<a
+	    href="${PREFIX}_subject.html">subject</a>&nbsp;] [&nbsp;<a
+	    href="${PREFIX}_author.html">author</a>&nbsp;]</td></tr>
     </table>
     <hr />
 <pre>
@@ -302,37 +302,37 @@ EOF
 
     # Add line to index
     cat >>/tmp/dlgindex.$$ <<EOF
-<tr><td><a href="$f.html">$SUBJECT</a></td><td>$FROM</td><td>$DATE</td></tr>
+<tr><td><a href="$F.html">$SUBJECT</a></td><td>$FROM</td><td>$DATE</td></tr>
 EOF
 
 done
 
 # Generate index files
-cat > $PREFIX_subject.html <<EOF
+cat > ${PREFIX}_subject.html <<EOF
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
-    <title>$TITLE: Message index</title>
+    <title>${TITLE}Message index</title>
   </head>
   <body>
-    <h1>$TITLE: Message index</h1>
+    <h1>${TITLE}Message index</h1>
 
     <table>
 	<tr>
-	    <th><a href="$PREFIX_subject.html">Subject</a></th>
-	    <th><a href="$PREFIX_author.html">Author</a></th>
-	    <th><a href="$PREFIX_date.html">Date</a></th>
+	    <th><a href="${PREFIX}_subject.html">Subject</a></th>
+	    <th><a href="${PREFIX}_author.html">Author</a></th>
+	    <th><a href="${PREFIX}_date.html">Date</a></th>
 	</tr>
 EOF
 
-cp $PREFIX_subject.html $PREFIX_author.html
-cp $PREFIX_subject.html $PREFIX_date.html
+cp ${PREFIX}_subject.html ${PREFIX}_author.html
+cp ${PREFIX}_subject.html ${PREFIX}_date.html
 
 sort --field-separator='>' +8 /tmp/dlgindex.$$ > /tmp/dlgindex.$$~
-cat /tmp/dlgindex.$$~ >> $PREFIX_date.html
-sort --field-separator='>' +3 /tmp/dlgindex.$$~ >> $PREFIX_subject.html
-sort --field-separator='>' +6 /tmp/dlgindex.$$~ >> $PREFIX_author.html
+cat /tmp/dlgindex.$$~ >> ${PREFIX}_date.html
+sort --field-separator='>' +3 /tmp/dlgindex.$$~ >> ${PREFIX}_subject.html
+sort --field-separator='>' +6 /tmp/dlgindex.$$~ >> ${PREFIX}_author.html
 
 cat >/tmp/dlgindex.$$ <<EOF
     </table>
@@ -342,9 +342,9 @@ cat >/tmp/dlgindex.$$ <<EOF
 </html>
 EOF
 
-cat /tmp/dlgindex.$$ >> $PREFIX_subject.html
-cat /tmp/dlgindex.$$ >> $PREFIX_author.html
-cat /tmp/dlgindex.$$ >> $PREFIX_date.html
+cat /tmp/dlgindex.$$ >> ${PREFIX}_subject.html
+cat /tmp/dlgindex.$$ >> ${PREFIX}_author.html
+cat /tmp/dlgindex.$$ >> ${PREFIX}_date.html
 
 rm /tmp/dlgindex.$$
 rm /tmp/dlgindex.$$~

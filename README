@@ -1,0 +1,57 @@
+Welcome to dlg2html, a set of scripts which converts DLG (Dialog)
+Pro BBS messages to HTML.
+
+LICENCE
+-------
+
+dlg2html is free software. Please see the file COPYING for details.
+
+
+SYSTEM REQUIREMENTS
+-------------------
+
+To run dlg2html, you will need the following:
+
+* GNU bash
+* GNU Core Utilities (coreutils)
+
+These packages are typically already installed on most GNU/Linux
+systems.
+
+
+INSTALLATION
+------------
+
+Copy the files dlgsplit and dlg2html to somewhere in your command path
+(e.g., /usr/local/bin).
+
+
+RUNNING DLG2HTML
+----------------
+
+DLG Pro (also known as Dialog or DLG) is a bulletin board system (BBS)
+for the Amiga personal computer.  dlg2html is a set of shell scripts
+which help automate the conversion DLG message bases to HTML for
+archiving or mirroring on the Web.  The HTML message files contain the
+appropriate links to the next and previous messages, as well as to any
+replies or referenced messages; a message index is also produced.
+dlg2html works with terminal dumps of DLG message boards, which means
+you do not need access to the actual BBS files to perform the
+conversion.  The dlg2html distribution consists of two shell scripts,
+dlgsplit and dlg2html.
+
+dlgsplit takes as input a terminal dump of a range of DLG messages and
+splits it into a number of files, one for each message.  The files are
+named xx1, xx2, etc., where 'xx' is some user-defined prefix, and the
+numbers are the BBS message numbers.
+
+dlg2html takes as input the files produced by dlgsplit and outputs
+XHTML 1.0 files xx1.html, xx2.html, etc., plus message index files
+xx_subject.html, xx_date.html, and xx_author.html.
+
+The behaviour of the two scripts can be modified via command-line
+options.  Run the scripts with the option `--help' for a summary of
+the command syntax and the available options.
+
+For an example of the input expected by dlgsplit, see the file
+`example.txt'.
