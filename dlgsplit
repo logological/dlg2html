@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlgsplit,v 1.3 2004-03-27 22:01:55 psy Exp $
+# $Id: dlgsplit,v 1.4 2004-03-27 22:02:12 psy Exp $
 #
 # This script splits a text file containing n DLG messages into n files
 # each containing one message.
@@ -80,3 +80,5 @@ do
     G=`head -1 $F | sed -e 's/^.*MSG //;s/ OF.*//'`
     cp $F $CWD/$PREFIX$G
 done
+
+cd $CWD
