@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlg2html,v 1.6 2004-03-28 20:13:00 psy Exp $
+# $Id: dlg2html,v 1.7 2004-03-28 20:27:48 psy Exp $
 #
 # This script parses files containing DLG messages and produces XHTML pages.
 # Input consists of text files xx1, xx2, etc.; output consists
@@ -138,6 +138,8 @@ do
 	| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
     MSG=`head -1 $F \
 	| sed -e 's/^.*MSG //;s/ OF.*//'`
+    REPLY=""
+    REF=""
 
     # Extract header data from referenced message
     if fgrep '[Reply To' $F >&/dev/null
@@ -301,6 +303,7 @@ EOF
 EOF
 
     # Add line to index
+    DATE=`date --date="$DATE" +'%Y-%m-%d %H:%M'`
     cat >>/tmp/dlgindex.$$ <<EOF
 <tr><td><a href="$F.html">$SUBJECT</a></td><td>$FROM</td><td>$DATE</td></tr>
 EOF
