@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlgsplit,v 1.6 2004-03-28 16:23:07 psy Exp $
+# $Id: dlgsplit,v 1.7 2004-03-28 16:29:39 psy Exp $
 #
 # This script splits a text file containing n DLG messages into n files --
 # named xx000001, xx000002, etc. -- each containing one message.
@@ -49,6 +49,7 @@ function error() # errormessage
     echo "$ME: $1" 1>&2
 }
 
+# Parse command line
 while [ $# -gt 0 ]
 do
     case $1 in
