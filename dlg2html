@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlgmsg2html,v 1.4 2004-03-28 18:41:43 psy Exp $
+# $Id: dlg2html,v 1.1 2004-03-28 18:42:42 psy Exp $
 #
 # This script parses files containing DLG messages and produces XHTML pages.
 # Input consists of text files xx1, xx2, etc.; output consists
