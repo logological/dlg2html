@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlg2html,v 1.3 2004-03-28 18:59:49 psy Exp $
+# $Id: dlg2html,v 1.4 2004-03-28 19:08:40 psy Exp $
 #
 # This script parses files containing DLG messages and produces XHTML pages.
 # Input consists of text files xx1, xx2, etc.; output consists
@@ -145,13 +145,19 @@ do
 	REF=`head -2 $F \
 	    | tail -1 \
 	    | sed -e 's/^.*Reply To //;s/\].*//'`
-	REF_FROM=`head -1 $PREFIX$REF \
-	    | cut -c12-43 \
-	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
-	REF_SUBJECT=`head -4 $PREFIX$REF \
-	    | tail -1 \
-	    | cut -c12- \
-	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+	if [ -f $PREFIX$REF ]
+	then
+	    REF_FROM=`head -1 $PREFIX$REF \
+		| cut -c12-43 \
+		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+	    REF_SUBJECT=`head -4 $PREFIX$REF \
+		| tail -1 \
+		| cut -c12- \
+		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+	else
+	    error "warning: msg $MSG has non-existent reference $REF"
+	    REF=""
+	fi
     fi
 
     # Extract header data from reply
@@ -160,13 +166,19 @@ do
 	REPLY=`head -2 $F \
 	    | tail -1 \
 	    | sed -e 's/^.*Has Reply //;s/\].*//'`
-	REPLY_FROM=`head -1 $PREFIX$REPLY \
-	    | cut -c12-43 \
-	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
-	REPLY_SUBJECT=`head -4 $PREFIX$REPLY \
-	    | tail -1 \
-	    | cut -c12- \
-	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+	if [ -f $PREFIX$REPLY ]
+	then
+	    REPLY_FROM=`head -1 $PREFIX$REPLY \
+		| cut -c12-43 \
+		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+	    REPLY_SUBJECT=`head -4 $PREFIX$REPLY \
+		| tail -1 \
+		| cut -c12- \
+		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+	else
+	    error "warning: msg $MSG has non-existent reply $REPLY"
+	    REPLY=""
+	fi
     fi
 
     # Extract header data from next message
