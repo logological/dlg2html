@@ -40,7 +40,7 @@ install -D dlgsplit $RPM_BUILD_ROOT%{_prefix}/bin/dlgsplit
 %defattr(-,root,root,-)
 %{_prefix}/bin/dlg2html
 %{_prefix}/bin/dlgsplit
-%doc AUTHORS COPYING NEWS README
+%doc AUTHORS COPYING NEWS README example.txt
 
 %changelog
 * Fri Dec  4 2004 Tristan Miller <psychonaut@nothingisreal.com> - 
