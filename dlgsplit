@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# $Id: dlgsplit,v 1.1 2004-03-27 21:59:40 psy Exp $
+#
+# This script splits a text file containing n DLG messages into n files
+# each containing one message.
+
+# Set up some variables
+PROGRAMNAME="Newsalyzer"
+PROGRAMVERSION="v0.9"
+PROGRAMURL="http://www.nothingisreal.com/newsalyzer/"
+PROGRAMCOPYRIGHT="2003 Tristan Miller"
+WELCOME="$PROGRAMNAME $PROGRAMVERSION
+Copyright (C) $PROGRAMCOPYRIGHT
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+DIGITS=6
+PREFIX="xx"
+NUM_FILES=0
+
+# Usage instructions
+ME=`basename $0`
+USAGE="Usage: $ME [options] message_file
+
+General options:
+    -p PREFIX       use PREFIX instead of `xx'
+    -?, --help      output this message and exit
+    -v, --version   output version information and exit
+"
+
+# Error function
+function error() # errormessage
+{
+    echo "$ME: $1" 1>&2
+}
+
+while [ $# -gt 0 ]
+do
+    case $1 in
+    -p)        shift
+	       if [ $# -eq 0 ]
+	       then
+		    error "no prefix specified"
+		    exit 1
+	       fi
+	       PREFIX="$1"
+	       ;;
+    -\?)       echo "$USAGE"; exit 0    ;;
+    --\?)      echo "$USAGE"; exit 0    ;;
+    --help)    echo "$USAGE"; exit 0    ;;
+    -v)        echo "$WELCOME"; exit 0    ;;
+    --version) echo "$WELCOME"; exit 0    ;;
+    -*)        error "invalid argument '$1'"
+	       exit 1 ;;
+    *)         if [ $NUM_FILES -eq 0 ]
+	       then
+		    FILENAME=$1
+		    let "NUM_FILES+=1" ;;
+	       else
+                    error "only one message file can be specified"
+                    exit 1
+	       fi
+	       shift
+	       ;;
+    esac
+    shift
+done
+
+# Create temp directory for dirty work
+CWD=`pwd`
+mkdir /tmp/dlgsplit.$$
+cd /tmp/dlgsplit.$$
+
+# Split file
+csplit --prefix=$PREFIX --digits=$DIGITS $CWD/$FILENAME '/^\[From    \]/' '{*}'
+
+# Rename files according to their message numbers
+for F in *
+do
+    G=`head -1 $F | sed -e 's/^.*MSG //;s/ OF.*//'`
+    cp $F $CWD/$PREFIX$G
+done
