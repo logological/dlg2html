@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlgsplit,v 1.4 2004-03-27 22:02:12 psy Exp $
+# $Id: dlgsplit,v 1.5 2004-03-27 22:12:01 psy Exp $
 #
 # This script splits a text file containing n DLG messages into n files
 # each containing one message.
@@ -23,7 +23,7 @@ ME=`basename $0`
 USAGE="Usage: $ME [options] message_file
 
 General options:
-    -p PREFIX       use PREFIX instead of `xx'
+    -p PREFIX       use PREFIX instead of \`xx'
     -?, --help      output this message and exit
     -v, --version   output version information and exit
 "
@@ -50,7 +50,7 @@ do
     --help)    echo "$USAGE"; exit 0    ;;
     -v)        echo "$WELCOME"; exit 0    ;;
     --version) echo "$WELCOME"; exit 0    ;;
-    -*)        error "invalid argument `$1'"
+    -*)        error "invalid argument \`$1'"
 	       exit 1 ;;
     *)         if [ $NUM_FILES -eq 0 ]
 	       then
@@ -65,6 +65,11 @@ do
     esac
     shift
 done
+if [ $NUM_FILES -eq 0 ]
+then
+    error "no message file specified"
+    exit 1
+fi
 
 # Create temp directory for dirty work
 CWD=`pwd`
@@ -72,13 +77,14 @@ mkdir /tmp/dlgsplit.$$
 cd /tmp/dlgsplit.$$
 
 # Split file
-csplit --prefix=$PREFIX --digits=$DIGITS $CWD/$FILENAME '/^\[From    \]/' '{*}'
+csplit --digits=$DIGITS $CWD/$FILENAME '/^\[From    \]/' '{*}' 1>&2 >/dev/null
 
 # Rename files according to their message numbers
 for F in *
 do
     G=`head -1 $F | sed -e 's/^.*MSG //;s/ OF.*//'`
-    cp $F $CWD/$PREFIX$G
+    mv "$F" "$CWD/$PREFIX$G"
 done
 
-cd $CWD
+# Clean up
+rmdir /tmp/dlgsplit.$$
