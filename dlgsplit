@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# $Id: dlgsplit,v 1.7 2004-03-28 16:29:39 psy Exp $
+# $Id: dlgsplit,v 1.8 2004-03-28 16:56:45 psy Exp $
 #
 # This script splits a text file containing n DLG messages into n files --
-# named xx000001, xx000002, etc. -- each containing one message.
+# named xx1, xx2, etc. -- each containing one message.
 #
 # Copyright (C) 2004 Tristan Miller <psychonaut@nothingisreal.com>
 #
