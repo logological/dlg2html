@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlgsplit,v 1.9 2004-03-28 19:10:34 psy Exp $
+# $Id: dlgsplit,v 1.10 2004-03-28 19:11:13 psy Exp $
 #
 # This script splits a text file containing n DLG messages into n files --
 # named xx1, xx2, etc. -- each containing one message.
@@ -105,7 +105,7 @@ csplit -z --digits=$DIGITS $CWD/$FILENAME '/^\[From    \]/' '{*}' \
 for F in *
 do
     G=`head -1 $F | sed -e 's/^.*MSG //;s/ OF.*//'`
-    if [ $QUIETMODE -ne 0 ]
+    if [ $QUIETMODE -eq 0 ]
     then
 	echo "Found message $G..."
     fi

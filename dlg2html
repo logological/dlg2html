@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: dlg2html,v 1.4 2004-03-28 19:08:40 psy Exp $
+# $Id: dlg2html,v 1.5 2004-03-28 19:12:04 psy Exp $
 #
 # This script parses files containing DLG messages and produces XHTML pages.
 # Input consists of text files xx1, xx2, etc.; output consists
@@ -116,7 +116,7 @@ LAST_MSG=`ls -1 $PREFIX* \
 # For each message
 for F in $PREFIX*
 do
-    if [ $QUIETMODE -ne 0 ]
+    if [ $QUIETMODE -eq 0 ]
     then
 	echo Processing message file $F... 1>&2
     fi
