@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# $Id: dlgsplit,v 1.1 2004-03-27 21:59:40 psy Exp $
+# $Id: dlgsplit,v 1.2 2004-03-27 22:00:14 psy Exp $
 #
 # This script splits a text file containing n DLG messages into n files
 # each containing one message.
 
 # Set up some variables
-PROGRAMNAME="Newsalyzer"
-PROGRAMVERSION="v0.9"
-PROGRAMURL="http://www.nothingisreal.com/newsalyzer/"
-PROGRAMCOPYRIGHT="2003 Tristan Miller"
+PROGRAMNAME="dlgsplit"
+PROGRAMVERSION="v1.0"
+PROGRAMURL="http://www.nothingisreal.com/dlg2html/"
+PROGRAMCOPYRIGHT="2004 Tristan Miller"
 WELCOME="$PROGRAMNAME $PROGRAMVERSION
 Copyright (C) $PROGRAMCOPYRIGHT
 This is free software; see the source for copying conditions.  There is NO
