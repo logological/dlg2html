@@ -1,0 +1,130 @@
+#!/bin/bash
+
+# This shell script parses DLG (Dialog) messages and produces HTML pages.
+# It assumes that the message files have been concatenated and then
+# separated via the following commands:
+#
+#cat ad\&d?-?.log > addlog.txt
+#csplit --prefix=sd --digits=3 addlog.txt '/^\[From    \]/' '{*}'
+#for f in sd???; do G=`head -1 $f | sed -e 's/^.*MSG //;s/ OF.*//'`; cp $f add$G ;done
+
+echo Processing $1... 1>&2
+
+FROM=`head -1 $1 | cut -c12-43 | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+TO=`head -2 $1 | tail -1 | cut -c12-43 | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+DATE=`head -3 $1 | tail -1 | cut -c12- | sed -e 's/ 93 / 1993 /'`
+SUBJECT=`head -4 $1 | tail -1 | cut -c12- | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+MSG=`head -1 $1 | sed -e 's/^.*MSG //;s/ OF.*//'`
+
+if fgrep '[Reply To' $1 >&/dev/null
+then
+    REF=`head -2 $1 | tail -1 | sed -e 's/^.*Reply To //;s/\].*//'`
+    REF_FROM=`head -1 add$REF | cut -c12-43 | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+    REF_SUBJECT=`head -4 add$REF | tail -1 | cut -c12- | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+fi
+
+if fgrep '[Has Reply' $1 >&/dev/null
+then
+    REPLY=`head -2 $1 | tail -1 | sed -e 's/^.*Has Reply //;s/\].*//'`
+    REPLY_FROM=`head -1 add$REPLY | cut -c12-43 | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+    REPLY_SUBJECT=`head -4 add$REPLY | tail -1 | cut -c12- | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+fi
+
+if [ $MSG -lt 600 ]
+then
+    NEXT=`ls -1 add* | sort -n -k 1.4 | grep "^add$MSG\$" -A 1 | tail -1 | cut -c4-`
+    NEXT_FROM=`head -1 add$NEXT | cut -c12-43 | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+    NEXT_SUBJECT=`head -4 add$NEXT | tail -1 | cut -c12- | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+fi
+
+if [ $MSG -gt 6 ]
+then
+    PREV=`ls -1 add* | sort -n -k 1.4 | grep "^add$MSG\$" -B 1 | head -1 | cut -c4-`
+    PREV_FROM=`head -1 add$PREV | cut -c12-43 | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+    PREV_SUBJECT=`head -4 add$PREV | tail -1 | cut -c12- | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+fi
+
+cat <<EOF
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+    <meta http-equiv="Content-Language" content="en" />
+    <title>Sage's Desk AD&amp;D: $SUBJECT</title>
+    <link rel="Start" href="index.html" />
+    <link rel="Top" href="index.html" />
+    <link rel="Up" href="index.html" />
+    <link rel="Contents" href="index.html" />
+    <link rel="First" href="add6.html" />  
+    <link rel="Index" href="index_date.html" />  
+    <link rel="Last" href="add600.html" />  
+EOF
+if [ $MSG -lt 600 ]
+then
+    cat <<EOF
+    <link rel="Next" href="add$NEXT.html" />  
+EOF
+fi
+if [ $MSG -gt 6 ]
+then
+    cat <<EOF
+    <link rel="Prev" href="add$PREV.html" />  
+EOF
+fi
+cat <<EOF
+    <style type="text/css">
+      <!--
+	th {text-align: right}
+      -->
+    </style>
+  </head>
+  <body>
+    <h1>$SUBJECT</h1>
+    <table>
+      <tr><th>From:</th><td>$FROM</td></tr>
+      <tr><th>To:</th><td>$TO</td></tr>
+      <tr><th>Date:</th><td>$DATE</td></tr>
+    </table>
+    <table style="padding-left: 3em; font-size: smaller">
+EOF
+if [ $MSG -lt 600 ]
+then
+    cat <<EOF
+      <tr><th>Next message:</th><td><a href="add$NEXT.html">$NEXT_FROM: $NEXT_SUBJECT</a></td></tr>
+EOF
+fi
+if [ $MSG -gt 6 ]
+then
+    cat <<EOF
+      <tr><th>Previous message:</th><td><a href="add$PREV.html">$PREV_FROM: $PREV_SUBJECT</a></td></tr>
+EOF
+fi
+if [ $REF ]
+then
+    cat <<EOF
+      <tr><th>In reply to:</th><td><a href="add$REF.html">$REF_FROM: $REF_SUBJECT</a></td></tr>
+EOF
+fi
+if [ $REPLY ]
+then
+    cat <<EOF
+      <tr><th>Reply:</th><td><a href="add$REPLY.html">$REPLY_FROM: $REPLY_SUBJECT</a></td></tr>
+EOF
+fi
+cat <<EOF
+      <tr><th>Messages sorted by:</th><td>[&nbsp;<a
+	    href="index_date.html">date</a>&nbsp;] [&nbsp;<a
+	    href="index_subject.html">subject</a>&nbsp;] [&nbsp;<a
+	    href="index_author.html">author</a>&nbsp;]</td></tr>
+    </table>
+    <hr />
+<pre>
+EOF
+sed '1,5d;s/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g' $1
+cat <<EOF
+</pre>
+    <hr />
+    <p><a style="font-size: smaller" href="index.html">Sage's Desk AD&amp;D</a></p>
+  </body>
+</html>
+EOF
