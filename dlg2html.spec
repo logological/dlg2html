@@ -12,16 +12,14 @@ Requires: bash, coreutils, sed, grep
 Distribution: SuSE 9.0 (noarch)
 
 %description
-eoconv is a tool which converts text files to and from the following
-Esperanto text encodings:
-
-  * ASCII postfix h notation
-  * ASCII postfix x notation
-  * ASCII postfix caret (^) notation
-  * ASCII prefix caret (^) notation
-  * ISO-8859-3
-  * Unicode (UTF-7, UTF-8, UTF-16, UTF-32)
-  * HTML entities (decimal or hexadecimal)
+dlg2html is a set of Bash shell scripts which help automate the
+conversion of DLG Pro message bases to HTML for archiving or mirroring
+on the Web. (DLG Pro is a bulletin board system, or BBS, for Amiga
+personal computers.) The HTML message files contain the appropriate
+links to the next and previous messages, as well as to any replies or
+referenced messages; a message index is also produced. dlg2html works
+with terminal dumps of DLG message boards, which means you do not need
+access to the actual BBS files to perform the conversion.
 
 %prep
 %setup -q
