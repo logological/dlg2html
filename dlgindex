@@ -1,12 +1,8 @@
 #!/bin/bash
-
-# This shell script parses DLG (Dialog) messages and produces HTML pages.
-# It assumes that the message files have been concatenated and then
-# separated via the following commands:
 #
-#cat ad\&d?-?.log > addlog.txt
-#csplit --prefix=sd --digits=3 addlog.txt '/^\[From    \]/' '{*}'
-#for f in sd???; do G=`head -1 $f | sed -e 's/^.*MSG //;s/ OF.*//'`; cp $f add$G ;done
+# $Id: dlgindex,v 1.2 2004-03-27 22:49:31 psy Exp $
+#
+# This shell script generates an index of DLG messages
 
 cat > index_subject.html <<EOF
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
