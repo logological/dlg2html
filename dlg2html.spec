@@ -1,6 +1,6 @@
 Summary: Convert DLG Pro BBS message bases to HTML
 Name: dlg2html
-Version: 1.0
+Version: 1.1
 Release: 1
 License: GPL
 Group: Applications/Text
@@ -9,7 +9,7 @@ Source0: http://www.nothingisreal.com/dlg2html/%{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Prefix: %{_prefix}
 Requires: bash, coreutils, sed, grep
-Distribution: SuSE 9.0 (noarch)
+Distribution: SuSE 11.4 (noarch)
 
 %description
 dlg2html is a set of Bash shell scripts which help automate the
@@ -41,5 +41,5 @@ install -D dlgsplit $RPM_BUILD_ROOT%{_prefix}/bin/dlgsplit
 %doc AUTHORS COPYING NEWS README example.txt
 
 %changelog
-* Fri Dec  4 2004 Tristan Miller <psychonaut@nothingisreal.com> - 
+* Sun Oct 13 2013 Tristan Miller <psychonaut@nothingisreal.com> - 
 - Initial build.

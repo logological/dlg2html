@@ -1,11 +1,9 @@
 #!/bin/bash
 #
-# $Id: dlgsplit,v 1.10 2004-03-28 19:11:13 psy Exp $
-#
 # This script splits a text file containing n DLG messages into n files --
 # named xx1, xx2, etc. -- each containing one message.
 #
-# Copyright (C) 2004 Tristan Miller <psychonaut@nothingisreal.com>
+# Copyright (C) 2013 Tristan Miller <psychonaut@nothingisreal.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,8 +21,8 @@
 
 # Set up some variables
 PROGRAMNAME="dlgsplit"
-PROGRAMVERSION="v1.0"
-PROGRAMCOPYRIGHT="2004 Tristan Miller"
+PROGRAMVERSION="v1.1"
+PROGRAMCOPYRIGHT="2013 Tristan Miller"
 WELCOME="$PROGRAMNAME $PROGRAMVERSION
 Copyright (C) $PROGRAMCOPYRIGHT
 This is free software; see the source for copying conditions.  There is NO
@@ -35,7 +33,7 @@ NUM_FILES=0
 QUIETMODE=0
 
 # Usage instructions
-ME=`basename $0`
+ME=${0##*/}
 USAGE="Usage: $ME [options] message_file
 
 General options:
@@ -46,7 +44,7 @@ General options:
 "
 
 # Error function
-function error() # errormessage
+error() # errormessage
 {
     echo "$ME: $1" 1>&2
 }
@@ -93,24 +91,23 @@ then
 fi
 
 # Create temp directory for dirty work
-CWD=`pwd`
-mkdir /tmp/dlgsplit.$$
-cd /tmp/dlgsplit.$$
+TMPDIR=$(mktemp --tmpdir -d dlgsplit.XXXXXX)
+cd "$TMPDIR"
 
 # Split file
-csplit -z --digits=$DIGITS $CWD/$FILENAME '/^\[From    \]/' '{*}' \
+csplit -z --digits="$DIGITS" ~-/"$FILENAME" '/^\[From    \]/' '{*}' \
     1>&2 >/dev/null
 
 # Rename files according to their message numbers
 for F in *
 do
-    G=`head -1 $F | sed -e 's/^.*MSG //;s/ OF.*//'`
+    G=$(head -1 "$F" | sed -e 's/^.*MSG //;s/ OF.*//')
     if [ $QUIETMODE -eq 0 ]
     then
 	echo "Found message $G..."
     fi
-    mv "$F" "$CWD/$PREFIX$G"
+    mv "$F" ~-/"$PREFIX$G"
 done
 
 # Clean up
-rmdir /tmp/dlgsplit.$$
+rmdir "$TMPDIR"

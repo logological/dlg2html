@@ -1,13 +1,11 @@
 #!/bin/bash
 #
-# $Id: dlg2html,v 1.7 2004-03-28 20:27:48 psy Exp $
-#
 # This script parses files containing DLG messages and produces XHTML pages.
 # Input consists of text files xx1, xx2, etc.; output consists
 # of XHTML 1.0 files xx1.html, xx2.html, etc., plus index files
 # xx_subject.html, xx_date.html, and xx_author.html.
 #
-# Copyright (C) 2004 Tristan Miller <psychonaut@nothingisreal.com>
+# Copyright (C) 2013 Tristan Miller <psychonaut@nothingisreal.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,9 +23,9 @@
 
 # Set up some variables
 PROGRAMNAME="dlg2html"
-PROGRAMVERSION="1.0"
+PROGRAMVERSION="1.1"
 PROGRAMURL="http://www.nothingisreal.com/dlg2html/"
-PROGRAMCOPYRIGHT="2004 Tristan Miller"
+PROGRAMCOPYRIGHT="2013 Tristan Miller"
 WELCOME="$PROGRAMNAME $PROGRAMVERSION
 Copyright (C) $PROGRAMCOPYRIGHT
 This is free software; see the source for copying conditions.  There is NO
@@ -38,7 +36,7 @@ ROOT_URL="index.html"
 QUIETMODE=0
 
 # Usage instructions
-ME=`basename $0`
+ME=${0##*/}
 USAGE="Usage: $ME [options]
 
 General options:
@@ -51,7 +49,7 @@ General options:
 "
 
 # Error function
-function error() # errormessage
+error() # errormessage
 {
     echo "$ME: $1" 1>&2
 }
@@ -97,65 +95,66 @@ do
     esac
     shift
 done
-if [ `ls -1 $PREFIX*[^.html] | wc -l` -eq 0 ]
+if [ $(ls -1 "$PREFIX"*[^.html] | wc -l) -eq 0 ]
 then
     error "no message files matching prefix \`$PREFIX'"
     exit 1
 fi
 
 # Determine first and last message numbers
-FIRST_MSG=`ls -1 $PREFIX*[^.html] \
+FIRST_MSG=$(ls -1 "$PREFIX"*[^.html] \
     | sort -n -k 1.$((${#PREFIX}+1)) \
     | head -1 \
-    | cut -c$((${#PREFIX}+1))-`
-LAST_MSG=`ls -1 $PREFIX*[^.html] \
+    | cut -c$((${#PREFIX}+1))-)
+LAST_MSG=$(ls -1 "$PREFIX"*[^.html] \
     | sort -n -k 1.$((${#PREFIX}+1)) \
     | tail -1 \
-    | cut -c$((${#PREFIX}+1))-`
+    | cut -c$((${#PREFIX}+1))-)
 
 # For each message
-for F in $PREFIX*
+TMPFILE=$(mktemp --tmpdir dlg2html.XXXXXX)
+for F in "$PREFIX"*
 do
     if [ $QUIETMODE -eq 0 ]
     then
-	echo Processing message file $F... 1>&2
+	echo Processing message file "$F"... 1>&2
     fi
 
     # Extract header data
-    FROM=`head -1 $F \
+    FROM=$(head -1 "$F" \
 	| cut -c12-43 \
-	| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
-    TO=`head -2 $F \
+	| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
+    TO=$(head -2 "$F" \
 	| tail -1 \
 	| cut -c12-43 \
-	| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
-    DATE=`head -3 $F \
+	| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
+    DATE=$(head -3 "$F" \
 	| tail -1 \
-	| cut -c12-`
-    SUBJECT=`head -4 $F \
+	| cut -c12-)
+    SUBJECT=$(head -4 "$F" \
 	| tail -1 \
 	| cut -c12- \
-	| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
-    MSG=`head -1 $F \
-	| sed -e 's/^.*MSG //;s/ OF.*//'`
+	| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
+    MSG=$(head -1 "$F" \
+	| sed -e 's/^.*MSG //;s/ OF.*//')
     REPLY=""
     REF=""
 
     # Extract header data from referenced message
-    if fgrep '[Reply To' $F >&/dev/null
+    if fgrep '[Reply To' "$F" >&/dev/null
     then
-	REF=`head -2 $F \
+	REF=$(head -2 "$F" \
 	    | tail -1 \
-	    | sed -e 's/^.*Reply To //;s/\].*//'`
-	if [ -f $PREFIX$REF ]
+	    | sed -e 's/^.*Reply To //;s/\].*//')
+	if [ -f "$PREFIX$REF" ]
 	then
-	    REF_FROM=`head -1 $PREFIX$REF \
+	    REF_FROM=$(head -1 "$PREFIX$REF" \
 		| cut -c12-43 \
-		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
-	    REF_SUBJECT=`head -4 $PREFIX$REF \
+		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
+	    REF_SUBJECT=$(head -4 "$PREFIX$REF" \
 		| tail -1 \
 		| cut -c12- \
-		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
 	else
 	    error "warning: msg $MSG has non-existent reference $REF"
 	    REF=""
@@ -163,20 +162,20 @@ do
     fi
 
     # Extract header data from reply
-    if fgrep '[Has Reply' $F >&/dev/null
+    if fgrep '[Has Reply' "$F" >&/dev/null
     then
-	REPLY=`head -2 $F \
+	REPLY=$(head -2 "$F" \
 	    | tail -1 \
-	    | sed -e 's/^.*Has Reply //;s/\].*//'`
-	if [ -f $PREFIX$REPLY ]
+	    | sed -e 's/^.*Has Reply //;s/\].*//')
+	if [ -f "$PREFIX$REPLY" ]
 	then
-	    REPLY_FROM=`head -1 $PREFIX$REPLY \
+	    REPLY_FROM=$(head -1 "$PREFIX$REPLY" \
 		| cut -c12-43 \
-		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
-	    REPLY_SUBJECT=`head -4 $PREFIX$REPLY \
+		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
+	    REPLY_SUBJECT=$(head -4 "$PREFIX$REPLY" \
 		| tail -1 \
 		| cut -c12- \
-		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+		| sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
 	else
 	    error "warning: msg $MSG has non-existent reply $REPLY"
 	    REPLY=""
@@ -184,41 +183,41 @@ do
     fi
 
     # Extract header data from next message
-    if [ $MSG -lt $LAST_MSG ]
+    if [ "$MSG" -lt "$LAST_MSG" ]
     then
-	NEXT=`ls -1 $PREFIX*[^.html] \
+	NEXT=$(ls -1 "$PREFIX"*[^.html] \
 	    | sort -n -k 1.$((${#PREFIX}+1)) \
 	    | grep "^$PREFIX$MSG\$" -A 1 \
 	    | tail -1 \
-	    | cut -c$((${#PREFIX}+1))-`
-	NEXT_FROM=`head -1 $PREFIX$NEXT \
+	    | cut -c$((${#PREFIX}+1))-)
+	NEXT_FROM=$(head -1 "$PREFIX$NEXT" \
 	    | cut -c12-43 \
-	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
-	NEXT_SUBJECT=`head -4 $PREFIX$NEXT \
+	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
+	NEXT_SUBJECT=$(head -4 "$PREFIX$NEXT" \
 	    | tail -1 \
 	    | cut -c12- \
-	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
     fi
 
     # Extract header data from previous message
-    if [ $MSG -gt $FIRST_MSG ]
+    if [ "$MSG" -gt "$FIRST_MSG" ]
     then
-	PREV=`ls -1 $PREFIX*[^.html] \
+	PREV=$(ls -1 "$PREFIX"*[^.html] \
 	    | sort -n -k 1.$((${#PREFIX}+1)) \
 	    | grep "^$PREFIX$MSG\$" -B 1 \
 	    | head -1 \
-	    | cut -c$((${#PREFIX}+1))-`
-	PREV_FROM=`head -1 $PREFIX$PREV \
+	    | cut -c$((${#PREFIX}+1))-)
+	PREV_FROM=$(head -1 "$PREFIX$PREV" \
 	    | cut -c12-43 \
-	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
-	PREV_SUBJECT=`head -4 $PREFIX$PREV \
+	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
+	PREV_SUBJECT=$(head -4 "$PREFIX$PREV" \
 	    | tail -1 \
 	    | cut -c12- \
-	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'`
+	    | sed -e 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
     fi
 
     # Output XHTML
-    cat >$F.html <<EOF
+    cat >"$F.html" <<EOF
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
@@ -232,19 +231,19 @@ do
     <link rel="Index" href="${PREFIX}_date.html" />  
     <link rel="Last" href="$PREFIX$LAST_MSG.html" />  
 EOF
-    if [ $MSG -lt $LAST_MSG ]
+    if [ "$MSG" -lt "$LAST_MSG" ]
     then
-	cat >>$F.html <<EOF
+	cat >>"$F.html" <<EOF
     <link rel="Next" href="$PREFIX$NEXT.html" />  
 EOF
     fi
-    if [ $MSG -gt $FIRST_MSG ]
+    if [ "$MSG" -gt "$FIRST_MSG" ]
     then
-	cat >>$F.html <<EOF
+	cat >>"$F.html" <<EOF
     <link rel="Prev" href="$PREFIX$PREV.html" />  
 EOF
     fi
-    cat >>$F.html <<EOF
+    cat >>"$F.html" <<EOF
     <style type="text/css">
       <!--
 	th {text-align: right}
@@ -260,31 +259,31 @@ EOF
     </table>
     <table style="padding-left: 3em; font-size: smaller">
 EOF
-    if [ $MSG -lt $LAST_MSG ]
+    if [ "$MSG" -lt "$LAST_MSG" ]
     then
-	cat >>$F.html <<EOF
+	cat >>"$F.html" <<EOF
       <tr><th>Next message:</th><td><a href="$PREFIX$NEXT.html">$NEXT_FROM: $NEXT_SUBJECT</a></td></tr>
 EOF
     fi
-    if [ $MSG -gt $FIRST_MSG ]
+    if [ "$MSG" -gt "$FIRST_MSG" ]
     then
-	cat >>$F.html <<EOF
+	cat >>"$F.html" <<EOF
       <tr><th>Previous message:</th><td><a href="$PREFIX$PREV.html">$PREV_FROM: $PREV_SUBJECT</a></td></tr>
 EOF
     fi
-    if [ $REF ]
+    if [ "$REF" ]
     then
-	cat >>$F.html <<EOF
+	cat >>"$F.html" <<EOF
       <tr><th>In reply to:</th><td><a href="$PREFIX$REF.html">$REF_FROM: $REF_SUBJECT</a></td></tr>
 EOF
     fi
-    if [ $REPLY ]
+    if [ "$REPLY" ]
     then
-	cat >>$F.html <<EOF
+	cat >>"$F.html" <<EOF
       <tr><th>Reply:</th><td><a href="$PREFIX$REPLY.html">$REPLY_FROM: $REPLY_SUBJECT</a></td></tr>
 EOF
     fi
-    cat >>$F.html <<EOF
+    cat >>"$F.html" <<EOF
       <tr><th>Messages sorted by:</th><td>[&nbsp;<a
 	    href="${PREFIX}_date.html">date</a>&nbsp;] [&nbsp;<a
 	    href="${PREFIX}_subject.html">subject</a>&nbsp;] [&nbsp;<a
@@ -293,8 +292,8 @@ EOF
     <hr />
 <pre>
 EOF
-    sed '1,5d;s/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g' $F >>$F.html
-    cat >>$F.html <<EOF
+    sed '1,5d;s/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g' "$F" >>"$F.html"
+    cat >>"$F.html" <<EOF
 </pre>
     <hr />
     <p>Generated by <a style="font-size: smaller" href="$PROGRAMURL">$PROGRAMNAME $PROGRAMVERSION</a></p>
@@ -303,15 +302,15 @@ EOF
 EOF
 
     # Add line to index
-    DATE=`date --date="$DATE" +'%Y-%m-%d %H:%M'`
-    cat >>/tmp/dlgindex.$$ <<EOF
+    DATE=$(date --date="$DATE" +'%Y-%m-%d %H:%M')
+    cat >>"$TMPFILE" <<EOF
 <tr><td><a href="$F.html">$SUBJECT</a></td><td>$FROM</td><td>$DATE</td></tr>
 EOF
 
 done
 
 # Generate index files
-cat > ${PREFIX}_subject.html <<EOF
+cat > "${PREFIX}"_subject.html <<EOF
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
@@ -329,15 +328,15 @@ cat > ${PREFIX}_subject.html <<EOF
 	</tr>
 EOF
 
-cp ${PREFIX}_subject.html ${PREFIX}_author.html
-cp ${PREFIX}_subject.html ${PREFIX}_date.html
+cp "${PREFIX}"_subject.html "${PREFIX}"_author.html
+cp "${PREFIX}"_subject.html "${PREFIX}"_date.html
 
-sort --field-separator='>' +8 /tmp/dlgindex.$$ > /tmp/dlgindex.$$~
-cat /tmp/dlgindex.$$~ >> ${PREFIX}_date.html
-sort --field-separator='>' +3 /tmp/dlgindex.$$~ >> ${PREFIX}_subject.html
-sort --field-separator='>' +6 /tmp/dlgindex.$$~ >> ${PREFIX}_author.html
+sort --field-separator='>' +8 "$TMPFILE" > "$TMPFILE"~
+cat "$TMPFILE"~ >> "${PREFIX}"_date.html
+sort --field-separator='>' +3 "$TMPFILE"~ >> "${PREFIX}"_subject.html
+sort --field-separator='>' +6 "$TMPFILE"~ >> "${PREFIX}"_author.html
 
-cat >/tmp/dlgindex.$$ <<EOF
+cat >"$TMPFILE" <<EOF
     </table>
     <hr />
     <p>Generated by <a style="font-size: smaller" href="$PROGRAMURL">$PROGRAMNAME $PROGRAMVERSION</a></p>
@@ -345,9 +344,9 @@ cat >/tmp/dlgindex.$$ <<EOF
 </html>
 EOF
 
-cat /tmp/dlgindex.$$ >> ${PREFIX}_subject.html
-cat /tmp/dlgindex.$$ >> ${PREFIX}_author.html
-cat /tmp/dlgindex.$$ >> ${PREFIX}_date.html
+cat "$TMPFILE" >> "${PREFIX}"_subject.html
+cat "$TMPFILE" >> "${PREFIX}"_author.html
+cat "$TMPFILE" >> "${PREFIX}"_date.html
 
-rm /tmp/dlgindex.$$
-rm /tmp/dlgindex.$$~
+rm "$TMPFILE"
+rm "$TMPFILE"~

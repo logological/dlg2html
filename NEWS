@@ -1,13 +1,16 @@
 dlg2html NEWS -- history of user-visible changes
-$Id: NEWS,v 1.2 2004-12-04 19:41:48 psy Exp $
 
-Copyright (C) 2004 Tristan Miller.  See the end of this file for
+Copyright (C) 2013 Tristan Miller.  See the end of this file for
 copying conditions.
 
 Please send dlg2html bug reports to Tristan Miller
 <psychonaut@nothingisreal.com>.
 
 
+Version 1.1
+
+    * Various minor security fixes.
+
 Version 1.0
 
     * Initial release.
@@ -15,7 +18,7 @@ Version 1.0
 ----------------------------------------------------------------------
 Copyright information:
 
-Copyright (C) 2004 Tristan Miller.
+Copyright (C) 2013 Tristan Miller.
 
    Permission is granted to anyone to make or distribute verbatim
    copies of this document as received, in any medium, provided that
