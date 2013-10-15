@@ -10,6 +10,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Prefix: %{_prefix}
 Requires: bash, coreutils, sed, grep
 Distribution: SuSE 11.4 (noarch)
+BuildArch: noarch
 
 %description
 dlg2html is a set of Bash shell scripts which help automate the
