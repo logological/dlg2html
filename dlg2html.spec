@@ -7,7 +7,6 @@ Group: Applications/Text
 URL: https://logological.org/%{name}
 Source0: https://files.nothingisreal.com/software/%{name}/%{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-Prefix: %{_prefix}
 Requires: bash, coreutils, sed, grep
 BuildArch: noarch
 
