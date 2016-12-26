@@ -1,15 +1,14 @@
 Summary: Convert DLG Pro BBS message bases to HTML
 Name: dlg2html
 Version: 1.1
-Release: 1
-License: GPL
+Release: 0
+License: GPL-2.0+
 Group: Applications/Text
-URL: http://www.nothingisreal.com/dlg2html/
-Source0: http://www.nothingisreal.com/dlg2html/%{name}-%{version}.tar.bz2
+URL: https://logological.org/%{name}
+Source0: https://files.nothingisreal.com/software/%{name}/%{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Prefix: %{_prefix}
 Requires: bash, coreutils, sed, grep
-Distribution: SuSE 11.4 (noarch)
 BuildArch: noarch
 
 %description
@@ -28,19 +27,24 @@ access to the actual BBS files to perform the conversion.
 %build
 
 %install
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
-install -D dlg2html $RPM_BUILD_ROOT%{_prefix}/bin/dlg2html
-install -D dlgsplit $RPM_BUILD_ROOT%{_prefix}/bin/dlgsplit
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+%{__install} -D dlg2html %{buildroot}%{_bindir}/dlg2html
+%{__install} -D dlgsplit %{buildroot}%{_bindir}/dlgsplit
 
 %clean
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%{_prefix}/bin/dlg2html
-%{_prefix}/bin/dlgsplit
+%{_bindir}/dlg2html
+%{_bindir}/dlgsplit
 %doc AUTHORS COPYING NEWS README example.txt
 
 %changelog
+* Mon Dec 26 2016 Tristan Miller <psychonaut@nothingisreal.com> - 
+- Clean up RPM for OBS.
+- Update URLs.
+- Update license header per SPDX Specification.
+
 * Sun Oct 13 2013 Tristan Miller <psychonaut@nothingisreal.com> - 
 - Initial build.
